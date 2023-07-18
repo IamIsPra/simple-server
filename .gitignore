@@ -1,0 +1,13 @@
+# Node.js specific
+node_modules/
+.DS_Store
+
+# Log files
+logs/
+
+# Environment variables
+.env
+.env.*
+
+# Editor specific files (e.g., Visual Studio Code)
+.vscode/
