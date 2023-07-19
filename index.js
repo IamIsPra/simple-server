@@ -4,8 +4,13 @@ const fastify = require("fastify")({ logger: true });
 const path = require("path");
 const { promisify } = require('util');
 
-// Convert the fs.writeFile function to a promise-based version
-const writeFileAsync = promisify(fs.writeFile);
+// Import the fastify-cors plugin
+const fastifyCors = require('fastify-cors');
+
+// Register the fastify-cors plugin
+fastify.register(fastifyCors, {
+  origin: true, // This allows all origins to access your API
+});
 
 // Helper function to check if a file exists
 const fileExists = async (filePath) => {
