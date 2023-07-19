@@ -7,6 +7,16 @@ const { promisify } = require('util');
 // Convert the fs.writeFile function to a promise-based version
 const writeFileAsync = promisify(fs.writeFile);
 
+// Helper function to check if a file exists
+const fileExists = async (filePath) => {
+  try {
+    await fs.promises.access(filePath, fs.constants.F_OK);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+
 // Route to respond with "hello: world" when the root URL is accessed
 fastify.get("/", async (request, reply) => {
   reply.code(200).send("Simple Server is running.");
@@ -27,18 +37,31 @@ fastify.get("/retrive/:fileName", async (request, reply) => {
   reply.code(200).send(assessment);
 });
 
-// Route to save request body to a JSON file with a timestamp as the file name
+// Route to save request body to a JSON file with an incrementing count as the file name
 fastify.post("/save/:fileName", async (request, reply) => {
   const { fileName } = request.params;
-  const timestamp = new Date().getTime();
-  const filePath = path.join(__dirname, `/files/${fileName}_${timestamp}.json`);
+  const filePathWithoutExt = path.join(__dirname, `/files/${fileName}`);
+
+  let count = 0;
+  let filePath = `${filePathWithoutExt}.json`;
+
+  // Get the full URL from the request
+  const protocol = request.raw.socket.encrypted ? 'https' : 'http';
+  const host = request.headers.host;
+  const fullURL = `${protocol}://${host}`;
+
+  // Increment count and update filePath if the file already exists
+  while (await fileExists(filePath)) {
+    count++;
+    filePath = `${filePathWithoutExt}_${count}.json`;
+  }
 
   try {
-    // Use { flag: 'wx+' } to create the file if not available and fail if it already exists
-    await writeFileAsync(filePath, JSON.stringify(request.body), { flag: 'wx+' });
+    // Use { flag: 'wx' } to create the file if not available and fail if it already exists
+    await fs.promises.writeFile(filePath, JSON.stringify(request.body), { flag: 'wx' });
 
     // Respond with a success message
-    reply.send({ message: "File saved successfully." });
+    reply.send({ message: "File saved successfully.", url: `${fullURL}/retrive/${path.basename(filePath, path.extname(filePath))}` });
   } catch (err) {
     // If there's an error during file writing, respond with an error message and log the error
     reply.code(500).send({ error: "Error saving the file." });
