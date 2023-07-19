@@ -65,7 +65,7 @@ To mock a POST API and save the response body, you can use the following endpoin
 POST http://localhost:3000/save/:fileName
 ```
 
-Replace `:fileName` with the desired name for the JSON file to store the POST data. The server will save the POST request body as JSON in a file named `:fileName_timestamp.json`, where `timestamp` is the current timestamp at the moment of the request.
+Replace `:fileName` with the desired name for the JSON file to store the POST data. The server will save the POST request body as JSON in a file named `:fileName.json`, and in case of filename conflicts, it will increment the counter and save the data in `:fileName_1.json`, `:fileName_2`.json, and so on.
 
 ### Example
 
@@ -76,7 +76,7 @@ POST http://localhost:3000/save/userData
 Body: { "username": "john_doe", "age": 30, "email": "john@example.com" }
 ```
 
-The server will create a JSON file named `userData_1626543814757.json` in the `files` directory with the content:
+The server will create a JSON file named `userData.json` in the `files` directory with the content:
 
 ```json
 {
@@ -89,10 +89,10 @@ The server will create a JSON file named `userData_1626543814757.json` in the `f
 **GET request**:
 
 ```
-GET http://localhost:3000/retrieve/userData_1626543814757
+GET http://localhost:3000/retrieve/userData
 ```
 
-The server will respond with the content of the `userData_1626543814757.json` file.
+The server will respond with the content of the `userData.json` file.
 
 ## Contributing
 
