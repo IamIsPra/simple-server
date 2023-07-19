@@ -2,10 +2,9 @@
 const fs = require("fs");
 const fastify = require("fastify")({ logger: true });
 const path = require("path");
-const { promisify } = require('util');
 
 // Import the fastify-cors plugin
-const fastifyCors = require('fastify-cors');
+const fastifyCors = require('@fastify/cors');
 
 // Register the fastify-cors plugin
 fastify.register(fastifyCors, {
